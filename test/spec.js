@@ -8,7 +8,9 @@ const app = new Application({
   args: [path.join(__dirname, '..')],
 });
 
-describe('Clipmaster 9000', function() {
+const appTitle = 'Clipboard Electron App';
+
+describe(appTitle, function() {
   this.timeout(10000);
 
   beforeEach(() => {
@@ -21,42 +23,59 @@ describe('Clipmaster 9000', function() {
     }
   });
 
-  it('should work', () => {
-    // Delete this test as soon as you write one of your own.
-    assert.ok(true);
+  it('shows an initial window', async () => {
+    const count = await app.client.getWindowCount();
+    return assert.strictEqual(count,1);
+
   });
 
-  it.skip('shows an initial window', async () => {
+  it('has the correct title', async () => {
+    const title = await app.client.waitUntilWindowLoaded().getTitle();
+    return assert.strictEqual(title, appTitle);
     // We'll do this one together.
   });
 
-  it.skip('has the correct title', async () => {
+  it('does not have the developer tools open', async () => {
     // We'll do this one together.
+    const devToolsAreOpen = await  app.client
+      .waitUntilWindowLoaded()
+      .browserWindow.isDevToolsOpened();
+    return assert.strictEqual(devToolsAreOpen, false);
+  });
+1
+  it('has a button with the text "Copy from Clipboard"', async () => {
+    const buttonText = await app.client.getText('#copy-from-clipboard');
+    return assert.strictEqual(buttonText, 'Copy from Clipboard');
   });
 
-  it.skip('does not have the developer tools open', async () => {
-    // We'll do this one together.
+  it('should not have any clippings when the application starts up', async () => {
+    await app.client. waitUntilWindowLoaded();
+    //"$" means document.querySelector
+    //"$$" means document.querySelectorAll
+    // They are native functions of Google Chrome and Firefox browsers.
+    // You can see $ and $$ definition in Safari as well.
+    // $('div');  // returns first DIV in DOM
+    // $$('div'); // returns all DIVs in DOM
+    const clippings = await app.client.$$('.clippings-list-item');
+    return assert.strictEqual(clippings.length, 0);
   });
 
-  it.skip('has a button with the text "Copy from Clipboard"', async () => {
-    // We'll do this one together.
+  it('should have one clipping when the "Copy From Clipboard" button has been pressed', async () => {
+    await app.client.waitUntilWindowLoaded();
+    await app.client.click('#copy-from-clipboard');
+    // Gets itens which has class "clippings-list-item"
+    const clippings = await app.client.$$('.clippings-list-item');
+    return assert.strictEqual(clippings.length, 1);
   });
 
-  it.skip('should not have any clippings when the application starts up', async () => {
-    // We'll do this one together.
-  });
-
-  it.skip('should have one clipping when the "Copy From Clipboard" button has been pressed', async () => {
-    /*
-     * Independent Exercise!
-     *
-     * - Click on the #copy-from-clipboard button.
-     * - Verify that there is now one .clippings-list-item element
-     *   on the page.
-     */
-  });
-
-  it.skip('should successfully remove a clipping', async () => {
+  it('should successfully remove a clipping', async () => {
+    await app.client.waitUntilWindowLoaded();
+    await app.client
+      .click('#copy-from-clipboard')
+      .moveToObject('.clippings-list-item')
+      .click('.remove-clipping');
+    const clippings = await app.client.$$('.clippings-list-item');
+    return assert.strictEqual(clippings.length, 0);
     // We'll do this one together.
   });
 
