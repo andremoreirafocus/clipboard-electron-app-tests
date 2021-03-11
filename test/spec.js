@@ -79,7 +79,7 @@ describe(appTitle, function() {
     // We'll do this one together.
   });
 
-  it.skip('should have the correct text in a new clipping', async () => {
+  it('should have the correct text in a new clipping', async () => {
     /*
      * Independent Exercise!
      *
@@ -92,9 +92,15 @@ describe(appTitle, function() {
      * Hint—You can write text to the clipboard using:
      *   app.electron.clipboard.writeText('Vegan Ham');
      */
+    const testText = 'It works or not?';
+    await app.client.waitUntilWindowLoaded();
+    app.electron.clipboard.writeText(testText);
+    await app.client.click('#copy-from-clipboard');
+    const clipboardText = await app.client.getText('.clipping-text');
+    return assert.strictEqual(clipboardText, testText);
   });
 
-  it.skip('it should write the text of the clipping to the clipboard', async () => {
+  it('it should write the text of the clipping to the clipboard', async () => {
     /*
      * Independent Exercise!
      *
@@ -110,5 +116,15 @@ describe(appTitle, function() {
      *   `app.electron.clipboard.readText()`.
      *
      */
+    const testText = 'Writimg something to the clipboard';
+    await app.client.waitUntilWindowLoaded();
+    app.electron.clipboard.writeText(testText);
+    await app.client.click("#copy-from-clipboard");
+    const newText = 'Writimg another text to the clipboard';
+    app.electron.clipboard.writeText(newText);
+    await app.client.click('.copy-clipping');
+    const clipboardContent = await app.electron.clipboard.readText();
+    // console.log({clipboardContent});
+    return assert.strictEqual(clipboardContent, testText);
   });
 });
