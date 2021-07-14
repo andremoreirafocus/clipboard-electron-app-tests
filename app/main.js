@@ -1,15 +1,30 @@
 const { app, BrowserWindow, globalShortcut } = require('electron');
 
 let mainWindow;
+let secondWindow;
 
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
     height: 500,
     width: 300,
-    show: false,
+    show: true,
+    x: 2100,
+    y: 500,
+    title: 'main',
+  });
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  console.log(`file://${__dirname}/index.html`);
+
+  secondWindow = new BrowserWindow({
+    height: 800,
+    width: 400,
+    x: 2200,
+    y: 400,
+    show: true,
+    title: 'second',
   });
 
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  secondWindow.loadURL(`file://${__dirname}/index2.html`);
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
